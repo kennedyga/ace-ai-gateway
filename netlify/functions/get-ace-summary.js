@@ -50,7 +50,8 @@ exports.handler = async function (event, context) {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-
+// Clean up the response by removing markdown formatting fences
+    const cleanedText = text.replace(/^```html\n?/, '').replace(/```$/, '');
     return {
       statusCode: 200,
       headers,
@@ -58,10 +59,10 @@ exports.handler = async function (event, context) {
     };
   } catch (error) {
     console.error("Error:", error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: "Failed to communicate with the AI model. Check server logs." }),
-    };
+   return {
+  statusCode: 200,
+  headers,
+  body: JSON.stringify({ summary: cleanedText }), // Use cleanedText here
+};
   }
 };
